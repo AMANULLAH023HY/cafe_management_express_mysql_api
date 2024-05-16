@@ -2,6 +2,7 @@ const JWT = require("jsonwebtoken");
 const db = require("../config/db");
 const nodemailer = require("nodemailer");
 
+
 // user registration controller
 const signupController = (req, res) => {
   try {
