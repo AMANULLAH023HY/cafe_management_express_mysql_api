@@ -1,5 +1,6 @@
 const JWT = require("jsonwebtoken");
 const db = require("../config/db");
+const nodemailer = require('nodemailer');
 
 // user registration controller
 const signupController = (req, res) => {
@@ -94,4 +95,71 @@ const loginController = (req, res) => {
   }
 };
 
-module.exports = { signupController, loginController };
+// forget password with mail controller 
+
+var transpoter = nodemailer.createTransport({
+    service:"gmail",
+    auth:{
+        user:process.env.EMAIL,
+        password:process.env.PASSWORD
+    }
+});
+
+const forgotPasswordController = (req,res)=>{
+    try {
+        const user = req.body;
+        let query = "SELECT email,password FROM user WHERE email = ?";
+
+        db.query(query,[user.email],(err,result)=>{
+            if(err){
+                res.status(500).json({
+                    message:"something went wrong",
+                    error:err.message
+                })
+            }else{
+                if(result.length<=0){
+                    res.status(200).json({
+                        message:"Password sent successfully to your email"
+                    })
+                }else{
+                    var mailOptions = {
+                        from:process.env.EMAIL,
+                        to:result[0].email,
+                        subject:"Password by Cafe management system ",
+                        htpm:`<p>
+                        <b>Your login details for Cafe management system</b>
+                        <br>
+                        <b>Email: </b>'+result[0].email+'<br>
+                        <b>Password: </b>'+result[0].password+'<br>
+                        <a href ="http://localhost:4200/" >Click here to login</a>
+                        
+                        </p>`
+
+                    };
+                    transpoter.sendMail(mailOptions,(err, info)=>{
+                        if(err){
+                            console.log(err);
+                        }else{
+                            console.log('Email sent:', +info.response)
+                        }
+                    });
+                    res.status(200).json({
+                        message:"Password sent successfully to your email"
+                    })
+
+
+                }
+
+            }
+        })
+
+        
+    } catch (error) {
+        res.status(500).json({
+            message:"Internal server Error",
+            error:error.message
+        })
+    }
+}
+
+module.exports = { signupController, loginController,forgotPasswordController };
