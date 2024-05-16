@@ -2,7 +2,6 @@ const JWT = require("jsonwebtoken");
 const db = require("../config/db");
 const nodemailer = require("nodemailer");
 
-
 // user registration controller
 const signupController = (req, res) => {
   try {
@@ -195,15 +194,15 @@ const updateUserController = (req, res) => {
           message: "Something went wrong",
           error: err.message,
         });
-      }else{
-        if(result.affectedRows == 0){
-            res.status(404).json({
-                message:"User id doesn't exist"
-            })
-        }else{
-            res.status(200).json({
-                message:"user updated successfully!"
-            })  
+      } else {
+        if (result.affectedRows == 0) {
+          res.status(404).json({
+            message: "User id doesn't exist",
+          });
+        } else {
+          res.status(200).json({
+            message: "user updated successfully!",
+          });
         }
       }
     });
@@ -217,21 +216,57 @@ const updateUserController = (req, res) => {
 
 //get checkToken controller
 
-const checkTokenController = (req,res)=>{
-    res.status(200).json({message:'true'});
-}
+const checkTokenController = (req, res) => {
+  res.status(200).json({ message: "true" });
+};
 
 // Chnage password controller
-const changePasswordController = (req,res)=>{
-    try {
-        
-    } catch (error) {
+const changePasswordController = (req, res) => {
+  try {
+    const user = req.body;
+    const email = res.locals.email;
+
+    let query = "SELECT * FROM user WHERE email = ? AND password = ?";
+    db.query(query, [email, user.oldPassword], (err, result) => {
+      if (err) {
         res.status(500).json({
-            message:"Internal server Error",
-            error:error.message
-        })
-    }
-}
+          message: "Somethign went wrong",
+          error: err.message,
+        });
+      } else {
+        if (result.length <= 0) {
+          res.status(400).json({
+            message: "Incorrect Old Password",
+          });
+        } else if (result[0].password == user.oldPassword) {
+          query = "UPDATE user SET password = ? WHERE email = ?";
+          db.query(query, [user.newPassword, email], (err, result) => {
+            if (err) {
+              res.status(500).json({
+                message: "Somethign went wrong",
+                error: err.message,
+              });
+            } else {
+              res.status(200).json({
+                message: "Password change successfully!",
+                user: result,
+              });
+            }
+          });
+        } else {
+          res.status(400).json({
+            message: "Somethign went wrong. Please try again later!",
+          });
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server Error",
+      error: error.message,
+    });
+  }
+};
 
 module.exports = {
   signupController,
@@ -240,5 +275,5 @@ module.exports = {
   getUserDetailsController,
   updateUserController,
   checkTokenController,
-  changePasswordController
+  changePasswordController,
 };
