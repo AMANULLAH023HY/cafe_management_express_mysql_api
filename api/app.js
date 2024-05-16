@@ -1,29 +1,28 @@
-const express =require(  "express");
-const dotenv =require ("dotenv");
-const bodyParser =require("body-parser");
-const db = require('./config/db')
-
-
+const express = require("express");
+const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
+const db = require("./config/db");
 
 // const cors = require('cors')
 dotenv.config();
 
 const app = express();
-// Middleware 
+// Middleware
 app.use(express.json());
 app.use(bodyParser.json());
 
 // ROUTES
 
-const userRoute = require('./routes/userRoute');
-app.use('/api/user',userRoute);
+// User routes
+const userRoute = require("./routes/userRoute");
+app.use("/api/user", userRoute);
 
-
-
-
+// Category routes
+const categoryRoute = require("./routes/categoryRoute");
+app.use("/api/category", categoryRoute);
 
 app.all("*", (req, res) => {
   res.status(404).send("OOPS! 404 page not found");
 });
 
-module.exports =  app;
+module.exports = app;

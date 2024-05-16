@@ -16,3 +16,12 @@ create table user(
 
 insert into user(name,contactNumber,email,password,status,role)values("Amin",'1234567890',"admin@gmail.com","123456", 'true',"admin");
 
+
+-- create category table 
+create table category(
+    id int NOT NULL AUTO_INCREMENT,
+    name varchar(250) NOT NULL,
+    primary key(id)
+);
+
+
