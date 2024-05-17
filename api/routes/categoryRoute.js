@@ -6,7 +6,7 @@ const {
   deleteCategotyController,
 } = require("../controllers/categoryController");
 const auth = require("../middleware/authentication");
-const checkToken = require("../middleware/checkRole");
+const checkRole = require("../middleware/checkRole");
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ const router = express.Router();
 router.post(
   "/addCategory",
   auth.authenticateToken,
-  checkToken.checkRole,
+  checkRole.checkRole,
   addCategoryController
 );
 
@@ -22,7 +22,7 @@ router.post(
 router.get(
   "/getCategory",
   auth.authenticateToken,
-  checkToken.checkRole,
+  checkRole.checkRole,
   getAllCategoryController
 );
 
@@ -30,7 +30,7 @@ router.get(
 router.patch(
   "/updateCategory",
   auth.authenticateToken,
-  checkToken.checkRole,
+  checkRole.checkRole,
   updateCategotyController
 );
 
@@ -38,7 +38,7 @@ router.patch(
 router.delete(
   "/deleteCategory",
   auth.authenticateToken,
-  checkToken.checkRole,
+  checkRole.checkRole,
   deleteCategotyController
 );
 

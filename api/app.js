@@ -21,6 +21,13 @@ app.use("/api/user", userRoute);
 const categoryRoute = require("./routes/categoryRoute");
 app.use("/api/category", categoryRoute);
 
+
+// Product routes
+const productRoute = require("./routes/productRoute");
+app.use("/api/product", productRoute);
+
+
+
 app.all("*", (req, res) => {
   res.status(404).send("OOPS! 404 page not found");
 });
