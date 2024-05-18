@@ -1,10 +1,11 @@
-
 const db = require("../config/db");
 const ejs = require("ejs");
 const pdf = require("html-pdf");
 const path = require("path");
 const uuid = require("uuid");
+const fs = require("fs");
 
+// generate bill pdf product details and user details
 const generateReport = (req, res) => {
   try {
     const generateUuid = uuid.v1();
@@ -12,7 +13,7 @@ const generateReport = (req, res) => {
 
     // Check if productDetails is a string and parse it if necessary
     let productDetailsReport;
-    if (typeof orderDetails.productDetails === 'string') {
+    if (typeof orderDetails.productDetails === "string") {
       try {
         productDetailsReport = JSON.parse(orderDetails.productDetails);
       } catch (parseError) {
@@ -47,7 +48,7 @@ const generateReport = (req, res) => {
           });
         } else {
           // Correct path to the report.ejs file
-          const templatePath = path.join(__dirname, 'report.ejs');
+          const templatePath = path.join(__dirname, "report.ejs");
 
           ejs.renderFile(
             templatePath,
@@ -98,5 +99,64 @@ const generateReport = (req, res) => {
   }
 };
 
-module.exports = { generateReport };
+// get pdf bill details in body controller
 
+const getBillPdfController = (req, res) => {
+  try {
+    const orderDetails = req.body;
+    const pdfPath = path.join(
+      __dirname,
+      "../generated_pdf/",
+      `${orderDetails.uuid}.pdf`
+    );
+    const templatePath = path.join(__dirname, "report.ejs");
+
+    if (fs.existsSync(pdfPath)) {
+      res.contentType("application/pdf");
+      fs.createReadStream(pdfPath).pipe(res);
+    } else {
+      const productDetailsReport = JSON.parse(orderDetails.productDetails);
+
+      ejs.renderFile(
+        templatePath,
+        {
+          productDetails: productDetailsReport,
+          name: orderDetails.name,
+          email: orderDetails.email,
+          contactNumber: orderDetails.contactNumber,
+          paymentMethod: orderDetails.paymentMethod,
+          totalAmount: orderDetails.total,
+        },
+        (err, data) => {
+          if (err) {
+            res.status(502).json({
+              message: "Something went wrong",
+              error: err.message,
+            });
+          } else {
+            pdf.create(data).toFile(pdfPath, (err, data) => {
+              if (err) {
+                res.status(503).json({
+                  message: "Something went wrong",
+                  error: err.message,
+                });
+              } else {
+                res.contentType("application/pdf");
+                fs.createReadStream(pdfPath).pipe(res);
+              }
+            });
+          }
+        }
+      );
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server Error!",
+      error: error.message,
+    });
+  }
+};
+
+
+
+module.exports = { generateReport, getBillPdfController };
