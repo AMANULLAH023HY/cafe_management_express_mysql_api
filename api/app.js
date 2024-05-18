@@ -26,6 +26,10 @@ app.use("/api/category", categoryRoute);
 const productRoute = require("./routes/productRoute");
 app.use("/api/product", productRoute);
 
+// Bill routes
+const billRoute = require("./routes/billRoute");
+app.use("/api/bill", billRoute);
+
 
 
 app.all("*", (req, res) => {
