@@ -26,6 +26,10 @@ app.use("/api/category", categoryRoute);
 const productRoute = require("./routes/productRoute");
 app.use("/api/product", productRoute);
 
+// Dashboard routes
+const dashboardRoute = require("./routes/dashboardRoute");
+app.use("/api/dashboard", dashboardRoute);
+
 // Bill routes
 const billRoute = require("./routes/billRoute");
 app.use("/api/bill", billRoute);
