@@ -158,5 +158,71 @@ const getBillPdfController = (req, res) => {
 };
 
 
+// get All bills controller 
+const getAllBillsController  = (req,res)=>{
+  try {
+let query = "SELECT * FROM bill ORDER BY id DESC";
+db.query(query,(err,result)=>{
+  if(err){
+    res.status(500).json({
+      message:"Something went wrong!",
+      error:err.message
+    })
+  }else{
+    res.status(200).json({
+      message:"Get all bill successfully!",
+      bill:result
+    })
+  }
+})
 
-module.exports = { generateReport, getBillPdfController };
+    
+  } catch (error) {
+    res.status(500).json({
+      message:"Internal server Error!",
+      error:error.message
+    })
+  }
+}
+
+// Delete bill by id controller 
+
+const deleteBillByIdController = (req,res)=>{
+try {
+  const id  = req.params.id;
+  let query = "DELETE FROM bill WHERE id = ?";
+  db.query(query,[id],(err,result)=>{
+    if(err){
+      res.status(500).json({
+        message:"Something went wrong!",
+        error:err.message
+      })
+    }else{
+      if(result.affectedRows == 0){
+        res.status(404).json({
+          message:"Bill id doesn't found!"
+        })
+      }else{
+        res.status(200).json({
+          message:"Bill deleted successfully!"
+        })
+      }
+    }
+  })
+  
+} catch (error) {
+  res.status(500).json({
+    message:"Internal server Error!",
+    error:error.message 
+  })
+}
+}
+
+
+
+module.exports = { 
+  generateReport, 
+  getBillPdfController,
+  getAllBillsController,
+  deleteBillByIdController
+ };
